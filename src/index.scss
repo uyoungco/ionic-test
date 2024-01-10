@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.emoji {
+  display: inline-block;
+  width: calc(1em + 2px);
+  height: calc(1em + 2px);
+  vertical-align: text-bottom;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}

@@ -1,0 +1,49 @@
+
+
+.article {
+  width: 100%;
+  height: 100%;
+  :global {
+    p {
+      //font-size: 0.18rem;
+      //line-height: 0.3rem;
+      //text-align: justify;
+      // word-break: break-all;
+      //color: var(--color-gray-900);
+      white-space: pre-wrap;
+      @apply text-default-800 text-base transition-colors;
+    }
+
+    .syl-image-wrapper {
+      // margin: 0.08rem 0;
+      @apply my-2;
+    }
+    .syl-image-fixer, .sylimage-fixer {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      -webkit-box-pack: end;
+      justify-content: flex-end;
+      @apply bg-default-200;
+
+      img {
+        position: relative;
+        display: block;
+        width: 100%;
+        // border: 0.5px solid rgba(0,0,0,.06);
+        border-radius: 0;
+      }
+      .syl-image-caption {
+        // padding: 0.08rem 0.12rem;
+        // font-size: 0.14rem;
+        // line-height: 0.2rem;
+        // color: rgb(151, 154, 168);
+
+        // background-color: rgb(247, 248, 252);
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+        @apply text-default-800 text-sm px-2 py-2 bg-default-200 transition-colors;
+      }
+    }
+  }
+}

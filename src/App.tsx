@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Redirect, Route } from 'react-router-dom';
+import { NextUIProvider } from "@nextui-org/react";
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home/Home';
@@ -24,25 +25,30 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
+/* tailwind */
+import './index.scss'
+
 
 setupIonicReact();
 
 const App: FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route path="/" exact={true}>
-          <Redirect to="/home" />
-        </Route>
-        <Route path="/home" exact={true}>
-          <Home />
-        </Route>
-        <Route path="/message/:id">
-           <ViewMessage />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+  <NextUIProvider>
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route path="/" exact={true}>
+            <Redirect to="/home" />
+          </Route>
+          <Route path="/home" exact={true}>
+            <Home />
+          </Route>
+          <Route path="/message/:id">
+            <ViewMessage />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
+  </NextUIProvider>
 );
 
 export default App;

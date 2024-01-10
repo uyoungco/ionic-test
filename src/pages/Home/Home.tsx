@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 import {
   IonContent,
   IonHeader,
@@ -8,62 +8,104 @@ import {
   IonRefresherContent,
   IonTitle,
   IonToolbar,
-  useIonViewWillEnter,
-  useIonLoading, useIonViewDidEnter, IonInfiniteScroll, IonInfiniteScrollContent
+  useIonLoading,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent
 } from '@ionic/react';
 import './Home.css';
 import axios from "axios";
 import {CheyouList, CheYouListRoot} from "./type";
 import CheyouItem from "@/components/CheyouItem";
 import {IonInfiniteScrollCustomEvent} from "@ionic/core/dist/types/components";
+import { useImmer } from "use-immer";
+import { useInfiniteScroll } from 'ahooks';
+import SuspenseLoading from "@/components/SuspenseLoading";
 
-const getData = async (page: number) => {
+
+const getData = async (page: number = 1) => {
+
   const data = await axios<CheYouListRoot>({
     url: 'https://lab.uyoung.co/api/cheyou_list',
     method: 'get',
     params: {
-      page
+      page,
     },
   })
-  return data.data
+  return {
+    list: data.data.data.cheyou_list,
+    nextId: page + 1
+  }
 }
 
 
 const Home: FC = () => {
-  const [page, setPage] = useState(1)
+  const {
+    data,
+    loading,
+    loadMoreAsync,
+    loadingMore,
+    reloadAsync
+  } = useInfiniteScroll<{
+    nextId: number;
+    list: CheyouList[]
+  }>((d) => getData(d?.nextId))
+  const scrollEl = useRef<HTMLIonInfiniteScrollElement>(null)
+  const refresherEl = useRef<HTMLIonRefresherElement>(null)
+  const [page, setPage] = useImmer(1)
   const [messages, setMessages] = useState<CheyouList[]>([]);
   const [present, dismiss] = useIonLoading();
-  
-  const fetchData = async () => {
-    const data = await getData(page)
-    setMessages((state) => state.concat(data.data.cheyou_list));
-  }
-  
-  useEffect(() => {
-    fetchData()
-  }, []);
+  const [isScrollOn, setIsScrollOn] = useState(false)
 
-  const refresh = async (e: CustomEvent) => {
-    setMessages([])
-    setPage(1)
-    await fetchData()
-    await e.detail.complete();
-    // setTimeout(() => e.detail.complete(), 500);
+  // console.log({ data, loading, loadMore, loadingMore })
+
+  const fetchData = async () => {
+    console.log('refresherEl', refresherEl)
+    const data = await getData(page).finally(() => {
+      scrollEl.current?.complete()
+      refresherEl.current?.complete()
+    })
+    setMessages((state) => state.concat(data.list));
+  }
+
+  // useEffect(() => {
+  //   fetchData()
+  //   loadMore()
+  //   console.log('page', page)
+  // }, [page]);
+
+  const refresh = (e: CustomEvent) => {
+    // console.log('CustomEvent', e)
+    // setMessages([])
+    // setPage((draft) => {
+    //   return 1
+    // })
+    // if (page === 1) {
+    //   fetchData().finally(() => {
+    //     e.detail.complete()
+    //   })
+    // }
+    reloadAsync().finally(() => {
+      e.detail.complete()
+    })
+
+    // e.detail.complete();
     // fetchData().then(() => {
     //   e.detail.complete();
     // })
   };
-  
-  
+
+
   const generateItems = async (e: IonInfiniteScrollCustomEvent<void>) => {
-    console.log('generateItems')
-    setPage((state) => state + 1)
-    await fetchData()
-    await e.target.complete()
+    // setPage((draft) => {
+    //   return draft + 1
+    // })
+    loadMoreAsync().finally(() => {
+      e.target.complete()
+    })
   };
-  
-  
-  
+
+
+
   return (
     <IonPage id="home-page">
       <IonHeader>
@@ -72,8 +114,7 @@ const Home: FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={false}>
-       
-          <IonRefresher slot="fixed" onIonRefresh={refresh}>
+        <IonRefresher ref={refresherEl} slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
@@ -84,15 +125,25 @@ const Home: FC = () => {
         {/*    </IonTitle>*/}
         {/*  </IonToolbar>*/}
         {/*</IonHeader>*/}
+        {
+          loading ? (
+            <SuspenseLoading />
+          ) : (
+            <>
+              <IonList>
+                { data?.list?.map(m => <CheyouItem key={m.gid} item={m} />) }
+              </IonList>
+              <IonInfiniteScroll
+                ref={scrollEl}
+                onIonInfinite={generateItems}
+                disabled={isScrollOn}
+              >
+                <IonInfiniteScrollContent></IonInfiniteScrollContent>
+              </IonInfiniteScroll>
+            </>
+          )
+        }
 
-        <IonList>
-          {messages.map(m => <CheyouItem key={m.gid} item={m} />)}
-        </IonList>
-        <IonInfiniteScroll
-          onIonInfinite={generateItems}
-        >
-          <IonInfiniteScrollContent></IonInfiniteScrollContent>
-        </IonInfiniteScroll>
       </IonContent>
     </IonPage>
   );

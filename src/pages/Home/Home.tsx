@@ -20,86 +20,75 @@ import {IonInfiniteScrollCustomEvent} from "@ionic/core/dist/types/components";
 import { useImmer } from "use-immer";
 import { useInfiniteScroll } from 'ahooks';
 import SuspenseLoading from "@/components/SuspenseLoading";
+import {useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
+import React from 'react';
 
 
-const getData = async (page: number = 1) => {
-
+const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCursor: number }> => {
+  console.log('param', param)
+  const { pageParam, signal } = param
   const data = await axios<CheYouListRoot>({
     url: 'https://lab.uyoung.co/api/cheyou_list',
     method: 'get',
     params: {
-      page,
+      page: pageParam,
     },
+    signal,
   })
   return {
-    list: data.data.data.cheyou_list,
-    nextId: page + 1
+    data: data.data.data.cheyou_list,
+    nextCursor: pageParam + 1
   }
 }
 
 
 const Home: FC = () => {
+  const queryClient = useQueryClient()
+  
+  
   const {
-    data,
-    loading,
-    loadMoreAsync,
-    loadingMore,
-    reloadAsync
-  } = useInfiniteScroll<{
-    nextId: number;
-    list: CheyouList[]
-  }>((d) => getData(d?.nextId))
+    isLoading,
+    data: qdata,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ['Home'],
+    queryFn: fetchProjects,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, pages,lastPageParam) => {
+      return lastPage.nextCursor
+    },
+  })
+  
+  useEffect(() => {
+    console.log("qdata", qdata)
+  }, [qdata])
+  
   const scrollEl = useRef<HTMLIonInfiniteScrollElement>(null)
   const refresherEl = useRef<HTMLIonRefresherElement>(null)
-  const [page, setPage] = useImmer(1)
-  const [messages, setMessages] = useState<CheyouList[]>([]);
-  const [present, dismiss] = useIonLoading();
-  const [isScrollOn, setIsScrollOn] = useState(false)
-
-  // console.log({ data, loading, loadMore, loadingMore })
-
-  const fetchData = async () => {
-    console.log('refresherEl', refresherEl)
-    const data = await getData(page).finally(() => {
-      scrollEl.current?.complete()
-      refresherEl.current?.complete()
-    })
-    setMessages((state) => state.concat(data.list));
-  }
-
-  // useEffect(() => {
-  //   fetchData()
-  //   loadMore()
-  //   console.log('page', page)
-  // }, [page]);
+  
 
   const refresh = (e: CustomEvent) => {
-    // console.log('CustomEvent', e)
-    // setMessages([])
-    // setPage((draft) => {
-    //   return 1
-    // })
-    // if (page === 1) {
-    //   fetchData().finally(() => {
-    //     e.detail.complete()
-    //   })
-    // }
-    reloadAsync().finally(() => {
+    queryClient.setQueryData(['Home'], (data) => ({
+      //pages: [],
+      // @ts-ignore
+      pages: data.pages.slice(0, 1),
+      // @ts-ignore
+      pageParams: data.pageParams.slice(0, 1),
+    }))
+    refetch().finally(() => {
       e.detail.complete()
     })
-
-    // e.detail.complete();
-    // fetchData().then(() => {
-    //   e.detail.complete();
-    // })
   };
 
 
   const generateItems = async (e: IonInfiniteScrollCustomEvent<void>) => {
-    // setPage((draft) => {
-    //   return draft + 1
-    // })
-    loadMoreAsync().finally(() => {
+    !isFetching && fetchNextPage().finally(() => {
       e.target.complete()
     })
   };
@@ -117,6 +106,30 @@ const Home: FC = () => {
         <IonRefresher ref={refresherEl} slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
+        
+        {
+          isLoading ? <SuspenseLoading /> : (
+            <>
+              <IonList>
+                {
+                  qdata?.pages?.map((group, i) => (
+                    <React.Fragment key={i}>
+                      {group.data.map((m) => (
+                        <CheyouItem key={m.gid} item={m} />
+                      ))}
+                    </React.Fragment>
+                  ))
+                }
+              </IonList>
+              <IonInfiniteScroll
+                ref={scrollEl}
+                onIonInfinite={generateItems}
+              >
+                <IonInfiniteScrollContent></IonInfiniteScrollContent>
+              </IonInfiniteScroll>
+            </>
+          )
+        }
 
         {/*<IonHeader collapse="condense">*/}
         {/*  <IonToolbar>*/}
@@ -125,24 +138,25 @@ const Home: FC = () => {
         {/*    </IonTitle>*/}
         {/*  </IonToolbar>*/}
         {/*</IonHeader>*/}
-        {
-          loading ? (
-            <SuspenseLoading />
-          ) : (
-            <>
-              <IonList>
-                { data?.list?.map(m => <CheyouItem key={m.gid} item={m} />) }
-              </IonList>
-              <IonInfiniteScroll
-                ref={scrollEl}
-                onIonInfinite={generateItems}
-                disabled={isScrollOn}
-              >
-                <IonInfiniteScrollContent></IonInfiniteScrollContent>
-              </IonInfiniteScroll>
-            </>
-          )
-        }
+        
+        {/*{*/}
+        {/*  loading ? (*/}
+        {/*    <SuspenseLoading />*/}
+        {/*  ) : (*/}
+        {/*    <>*/}
+        {/*      <IonList>*/}
+        {/*        { data?.list?.map(m => <CheyouItem key={m.gid} item={m} />) }*/}
+        {/*      </IonList>*/}
+        {/*      <IonInfiniteScroll*/}
+        {/*        ref={scrollEl}*/}
+        {/*        onIonInfinite={generateItems}*/}
+        {/*        disabled={isScrollOn}*/}
+        {/*      >*/}
+        {/*        <IonInfiniteScrollContent></IonInfiniteScrollContent>*/}
+        {/*      </IonInfiniteScroll>*/}
+        {/*    </>*/}
+        {/*  )*/}
+        {/*}*/}
 
       </IonContent>
     </IonPage>

@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { Message, getMessage } from '../../data/messages';
 import {
   IonBackButton,
   IonButtons,
@@ -9,7 +7,7 @@ import {
   IonItem,
   IonLabel,
   IonNote,
-  IonPage,
+  IonPage, IonSpinner,
   IonToolbar,
   useIonViewWillEnter,
 } from '@ionic/react';
@@ -22,30 +20,47 @@ import {renderEmoticon} from "@/utils/emoticons";
 import RenderImgs from './RenderImgs'
 import cx from "classnames";
 import Style from './index.module.scss'
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useEffect} from "react";
 
 
-const fetchData = async (id: string | number) => {
+const fetchData = async (param: any) => {
+  const { queryKey, signal } = param
   const data = await axios<CheyouDetailRoot>({
     url: 'https://nextjs.uyoung.co/api/cheyou_detail',
     method: 'get',
     params: {
-      group_id: id
-    }
+      group_id: queryKey[1]
+    },
+    signal
   })
 
-  return data.data
+  return data.data.data as CheyouDetailRoot['data']
 }
 
 function ViewMessage() {
-  const [data, setData] = useState<Data>();
+  const queryClient = useQueryClient()
   const params = useParams<{ id: string }>();
+  const query = useQuery({
+    queryKey: ['message', params.id],
+    queryFn: fetchData
+  })
+  const data = query?.data as unknown as CheyouDetailRoot['data']
+  
+  
+  useEffect(() => {
 
-
-  useIonViewWillEnter( () => {
-    fetchData(params.id).then(res => {
-      setData(res.data);
-    })
-  });
+    return () => {
+      queryClient.cancelQueries({ queryKey: ['message', params.id] })
+    }
+  }, [])
+  
+  
+  // useIonViewWillEnter( () => {
+  //   fetchData(params.id).then(res => {
+  //     setData(res.data);
+  //   })
+  // });
 
   const content = () => {
     // 有标题+内容
@@ -106,10 +121,13 @@ function ViewMessage() {
       </IonHeader>
 
       <IonContent fullscreen>
-        <div className="px-4 pt-4">
-          {content()}
-        </div>
-
+        {
+          query.isLoading ? <IonSpinner /> : (
+            <div className="px-4 pt-4">
+              {content()}
+            </div>
+          )
+        }
       </IonContent>
     </IonPage>
   );

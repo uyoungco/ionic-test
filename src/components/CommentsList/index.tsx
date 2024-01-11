@@ -9,6 +9,7 @@ import cx from "classnames";
 import dayjs from "@/utils/time";
 import {show} from "@ebay/nice-modal-react";
 import MoreCommentsModal from './MoreCommentsModal'
+import CommentsListSkeletion from './CommentsListSkeletion'
 
 export const parseImgs = (content_rich_span: string) => {
   const data = JSON.parse(content_rich_span) as ContentRichSpanRoot
@@ -42,12 +43,12 @@ const CommentsList: FC<CommentsListType> = ({ group_id }) => {
   const CardClass = "transition-colors px-4 border-divider border-b transition-transform-background outline-none text-foreground bg-content1 overflow-hidden"
 
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['CommentsList', group_id],
     queryFn: fetchData
   })
 
-  return (
+  return isLoading ? <CommentsListSkeletion /> : (
     <IonList>
       {
         data?.map((item, index) => (

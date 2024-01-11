@@ -10,7 +10,7 @@ import {
   IonToolbar,
   useIonLoading,
   IonInfiniteScroll,
-  IonInfiniteScrollContent
+  IonInfiniteScrollContent, IonSegment, IonSegmentButton, IonLabel
 } from '@ionic/react';
 import './Home.css';
 import axios from "axios";
@@ -26,12 +26,13 @@ import React from 'react';
 
 const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCursor: number }> => {
   console.log('param', param)
-  const { pageParam, signal } = param
+  const { pageParam, signal, queryKey } = param
   const data = await axios<CheYouListRoot>({
     url: 'https://lab.uyoung.co/api/cheyou_list',
     method: 'get',
     params: {
       page: pageParam,
+      tab_name: queryKey[1]
     },
     signal,
   })
@@ -44,7 +45,20 @@ const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCurs
 
 const Home: FC = () => {
   const queryClient = useQueryClient()
-
+  const [value, setValue] = useState('dongtai')
+  useEffect(() => {
+    queryClient.setQueryData(['Home'], (data: any) => {
+      if (data?.pages?.length) {
+        return {
+          //pages: [],
+          // @ts-ignore
+          pages: data.pages.slice(0, 1),
+          // @ts-ignore
+          pageParams: data.pageParams.slice(0, 1),
+        }
+      }
+    })
+  }, [])
 
   const {
     isLoading,
@@ -57,18 +71,14 @@ const Home: FC = () => {
     status,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['Home'],
+    queryKey: ['Home', value],
     queryFn: fetchProjects,
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages,lastPageParam) => {
       return lastPage.nextCursor
     },
   })
-
-  useEffect(() => {
-    console.log("qdata", qdata)
-  }, [qdata])
-
+  const contentRef = useRef<HTMLIonContentElement>(null);
   const scrollEl = useRef<HTMLIonInfiniteScrollElement>(null)
   const refresherEl = useRef<HTMLIonRefresherElement>(null)
 
@@ -93,16 +103,49 @@ const Home: FC = () => {
     })
   };
 
+  const listbar = [
+    {
+      label: '热门',
+      value: 'hot',
+    },
+    {
+      label: '动态',
+      value: 'dongtai',
+    },
+    {
+      label: '精选',
+      value: 'selected',
+    },
+    {
+      label: '价格讨论',
+      value: 'pricediscuss',
+    }
+  ]
 
+  const handleClick = (value: string) => {
+    setValue(value)
+    contentRef.current?.scrollToTop(500).finally(() => {
+      // refetch()
+    });
+  }
 
   return (
     <IonPage id="home-page">
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Home</IonTitle>
+          {/*<IonTitle>Home</IonTitle>*/}
+          <IonSegment value={value}>
+            {
+              listbar?.map(item => (
+                <IonSegmentButton value={item.value} onClick={() => handleClick(item.value)}>
+                  <IonLabel>{item.label}</IonLabel>
+                </IonSegmentButton>
+              ))
+            }
+          </IonSegment>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen={false}>
+      <IonContent fullscreen={false} ref={contentRef}>
         <IonRefresher ref={refresherEl} slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
@@ -124,6 +167,7 @@ const Home: FC = () => {
               <IonInfiniteScroll
                 ref={scrollEl}
                 onIonInfinite={generateItems}
+                disabled={!hasNextPage}
               >
                 <IonInfiniteScrollContent></IonInfiniteScrollContent>
               </IonInfiniteScroll>

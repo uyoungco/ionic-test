@@ -1478,6 +1478,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ebay/nice-modal-react@npm:^1.2.13":
+  version: 1.2.13
+  resolution: "@ebay/nice-modal-react@npm:1.2.13"
+  peerDependencies:
+    react: ">16.8.0"
+    react-dom: ">16.8.0"
+  checksum: efc5a4b46b6b1d9c96ea8452aa5624d21e1c272a51c82865cf137151b2de8444e66d58f77a21979797da8d4181978762208bc2ba817e778ef8b1ab5c68eb707f
+  languageName: node
+  linkType: hard
+
 "@emotion/is-prop-valid@npm:^0.8.2":
   version: 0.8.8
   resolution: "@emotion/is-prop-valid@npm:0.8.8"
@@ -7664,6 +7674,7 @@ __metadata:
     "@capacitor/haptics": 5.0.6
     "@capacitor/keyboard": 5.0.7
     "@capacitor/status-bar": 5.0.6
+    "@ebay/nice-modal-react": ^1.2.13
     "@ionic/react": ^7.0.0
     "@ionic/react-router": ^7.0.0
     "@nextui-org/react": ^2.2.9

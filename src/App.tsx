@@ -9,8 +9,8 @@ import {
 } from '@tanstack/react-query'
 import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
-
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import Nice from '@ebay/nice-modal-react'
 import Home from './pages/Home/Home';
 import ViewMessage from './pages/ViewMessage/ViewMessage';
 
@@ -75,23 +75,25 @@ const App: FC = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NextUIProvider>
-        <IonApp>
-          <IonReactRouter>
-            <IonRouterOutlet>
-              <Route path="/" exact={true}>
-                <Redirect to="/home" />
-              </Route>
-              <Route path="/home" exact={true}>
-                <Home />
-              </Route>
-              <Route path="/message/:id">
-                <ViewMessage />
-              </Route>
-            </IonRouterOutlet>
-          </IonReactRouter>
-        </IonApp>
-      </NextUIProvider>
+      <Nice.Provider>
+        <NextUIProvider>
+          <IonApp>
+            <IonReactRouter>
+              <IonRouterOutlet>
+                <Route path="/" exact={true}>
+                  <Redirect to="/home" />
+                </Route>
+                <Route path="/home" exact={true}>
+                  <Home />
+                </Route>
+                <Route path="/message/:id">
+                  <ViewMessage />
+                </Route>
+              </IonRouterOutlet>
+            </IonReactRouter>
+          </IonApp>
+        </NextUIProvider>
+      </Nice.Provider>
       <ReactQueryDevtools initialIsOpen />
       {showDevtools && (
         <React.Suspense fallback={null}>

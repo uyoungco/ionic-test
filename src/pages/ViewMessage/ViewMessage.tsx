@@ -22,6 +22,7 @@ import cx from "classnames";
 import Style from './index.module.scss'
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useEffect} from "react";
+import CommentsList from "@/components/CommentsList";
 
 
 const fetchData = async (param: any) => {
@@ -125,9 +126,18 @@ function ViewMessage() {
         </IonRefresher>
         {
           query.isLoading ? <IonSpinner /> : (
-            <div className="px-4 mt-4">
-              {content()}
-            </div>
+            <>
+              <div className="px-4 mt-4">
+                {content()}
+              </div>
+              {
+                data.comment_count ? (
+                  <div className="mt-8">
+                    <CommentsList group_id={params.id} />
+                  </div>
+                ) : null
+              }
+            </>
           )
         }
       </IonContent>

@@ -17,8 +17,6 @@ import axios from "axios";
 import {CheyouList, CheYouListRoot} from "./type";
 import CheyouItem from "@/components/CheyouItem";
 import {IonInfiniteScrollCustomEvent} from "@ionic/core/dist/types/components";
-import { useImmer } from "use-immer";
-import { useInfiniteScroll } from 'ahooks';
 import SuspenseLoading from "@/components/SuspenseLoading";
 import {useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
 import React from 'react';
@@ -47,7 +45,7 @@ const Home: FC = () => {
   const queryClient = useQueryClient()
   const [value, setValue] = useState('dongtai')
   useEffect(() => {
-    queryClient.setQueryData(['Home'], (data: any) => {
+    queryClient.setQueryData(['Home', value], (data: any) => {
       if (data?.pages?.length) {
         return {
           //pages: [],
@@ -57,6 +55,7 @@ const Home: FC = () => {
           pageParams: data.pageParams.slice(0, 1),
         }
       }
+      return
     })
   }, [])
 
@@ -84,7 +83,7 @@ const Home: FC = () => {
 
 
   const refresh = (e: CustomEvent) => {
-    queryClient.setQueryData(['Home'], (data: any) => ({
+    queryClient.setQueryData(['Home', value], (data: any) => ({
       //pages: [],
       // @ts-ignore
       pages: data.pages.slice(0, 1),

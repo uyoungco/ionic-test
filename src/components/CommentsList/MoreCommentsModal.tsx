@@ -34,12 +34,38 @@ const MoreCommentsModal: FC<MoreCommentsModalProps> = ({ list }) => {
     }
   }, []);
 
-  const handCancel = () => {
-    modal.hide()
-    modalRef.current?.onDidDismiss().finally(() => {
+  const handCancel = async () => {
+    modal.hide().then(() => {
       modal.resolveHide();
       if (!modal.keepMounted) modal.remove();
     })
+    // modalRef.current?.dismiss().finally(() => {
+    //
+    // });
+    // await modal.hide()
+    // await modalRef.current?.onDidDismiss().finally(() => {
+    //   modal.resolveHide();
+    //   if (!modal.keepMounted) modal.remove();
+    // })
+    // return true
+  }
+
+  const canDismiss = async (data?: any, role?: string) => {
+    console.log('data', data, role)
+    if (role === 'gesture') {
+      modal.hide().then(() => {
+        modal.resolveHide();
+        if (!modal.keepMounted) modal.remove();
+      })
+    }
+
+    // modal.hide()
+    // modal.resolveHide();
+    // if (!modal.keepMounted) modal.remove();
+    // modalRef.current?.onDidDismiss().finally(() => {
+    //
+    // });
+    return true
   }
 
   const CardClass = "transition-transform-background outline-none text-foreground "
@@ -49,7 +75,11 @@ const MoreCommentsModal: FC<MoreCommentsModalProps> = ({ list }) => {
     <IonModal
       isOpen={modal.visible}
       ref={modalRef}
-      presentingElement={presentingElement}
+      // initialBreakpoint={0.9}
+      // breakpoints={[0, 0.9]}
+      // handleBehavior="cycle"
+      // presentingElement={presentingElement}
+      // canDismiss={canDismiss}
     >
       <IonHeader>
         <IonToolbar>
@@ -57,11 +87,11 @@ const MoreCommentsModal: FC<MoreCommentsModalProps> = ({ list }) => {
             <IonButton onClick={handCancel}>Cancel</IonButton>
           </IonButtons>
           <IonTitle>该评论的全部回复</IonTitle>
-          <IonButtons slot="end">
-            <IonButton strong={true} onClick={() => confirm()}>
-              Confirm
-            </IonButton>
-          </IonButtons>
+          {/*<IonButtons slot="end">*/}
+          {/*  <IonButton strong={true} onClick={() => confirm()}>*/}
+          {/*    Confirm*/}
+          {/*  </IonButton>*/}
+          {/*</IonButtons>*/}
         </IonToolbar>
       </IonHeader>
       <IonContent>

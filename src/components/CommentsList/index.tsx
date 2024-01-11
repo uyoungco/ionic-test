@@ -10,6 +10,16 @@ import dayjs from "@/utils/time";
 import {show} from "@ebay/nice-modal-react";
 import MoreCommentsModal from './MoreCommentsModal'
 
+export const parseImgs = (content_rich_span: string) => {
+  const data = JSON.parse(content_rich_span) as ContentRichSpanRoot
+  if (data.links?.length && data.image_list) {
+    const list = Object.values(data?.image_list) as MotorArticleImg[]
+    // return renderImgs(list)
+    return <RenderImgs image_urls={list} />
+  }
+  return null
+}
+
 const fetchData = async (param: any) => {
   const { queryKey, signal } = param
   const data = await axios<SusCommentsRoot>({
@@ -31,15 +41,6 @@ export interface CommentsListType {
 const CommentsList: FC<CommentsListType> = ({ group_id }) => {
   const CardClass = "transition-colors px-4 border-divider border-b transition-transform-background outline-none text-foreground bg-content1 overflow-hidden"
 
-  const parseImgs = (content_rich_span: string) => {
-    const data = JSON.parse(content_rich_span) as ContentRichSpanRoot
-    if (data.links?.length && data.image_list) {
-      const list = Object.values(data?.image_list) as MotorArticleImg[]
-      // return renderImgs(list)
-      return <RenderImgs image_urls={list} />
-    }
-    return null
-  }
 
   const { data } = useQuery({
     queryKey: ['CommentsList', group_id],
@@ -56,7 +57,7 @@ const CommentsList: FC<CommentsListType> = ({ group_id }) => {
             lines="full"
             detail={false}
           >
-            <IonLabel  className="flex flex-col">
+            <IonLabel className="flex flex-col mr-[12px]">
               <div className="flex items-center py-2">
                 <div className="avatar">
                   <IonAvatar className="w-8 h-8 text-tiny z-0">
@@ -88,7 +89,7 @@ const CommentsList: FC<CommentsListType> = ({ group_id }) => {
                 {
                   item.comment.new_reply_list?.length ? (
                     <div
-                      // onClick={() => show(MoreCommentsModal, { list: item.comment.new_reply_list })}
+                      onClick={() => show(MoreCommentsModal, { list: item.comment.new_reply_list })}
                       className="py-2 text-xs leading-18 text-primary-600 cursor-pointer"
                     >
                       展开{item.comment.new_reply_list?.length}条回复

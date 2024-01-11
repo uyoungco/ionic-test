@@ -929,17 +929,14 @@ const Emoticons = {
   },
 }
 
-export const renderEmoticon = (text?: string) => {
+export const renderEmoticon = (text: string = '') => {
   const t = /(\[[^\]]+[\]])+?/g
   const n = RegExp(t.source);
   const r = "//lf3-cdn-tos.bytegoofy.com/goofy/toutiao/tt_tps/static/images/ttemoji_v2/"
-  if (text) {
-    return n.test(text) ? text.replace(t, (match) => {
-      // @ts-ignore
-      return Emoticons[match] ? `<i name="${match}" class="emoji" style="background-image:url(${r + Emoticons[match].image})"></i>` : match
-    }) : text
-  }
-  return ''
+  return text && n.test(text) ? text.replace(t, (match) => {
+    // @ts-ignore
+    return Emoticons[match] ? `<i name="${match}" class="emoji" style="background-image:url(${r + Emoticons[match].image})"></i>` : match
+  }) : text
 
   // return text.replace(/\[(.*?)\]/g, function (match, p1) {
   //

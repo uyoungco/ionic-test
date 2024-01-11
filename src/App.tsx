@@ -67,12 +67,12 @@ persistQueryClient({
 
 const App: FC = () => {
   const [showDevtools, setShowDevtools] = React.useState(false)
-  
+
   React.useEffect(() => {
     // @ts-ignore
     window.toggleDevtools = () => setShowDevtools((old) => !old)
   }, [])
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <NextUIProvider>

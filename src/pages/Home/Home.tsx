@@ -44,8 +44,8 @@ const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCurs
 
 const Home: FC = () => {
   const queryClient = useQueryClient()
-  
-  
+
+
   const {
     isLoading,
     data: qdata,
@@ -64,17 +64,17 @@ const Home: FC = () => {
       return lastPage.nextCursor
     },
   })
-  
+
   useEffect(() => {
     console.log("qdata", qdata)
   }, [qdata])
-  
+
   const scrollEl = useRef<HTMLIonInfiniteScrollElement>(null)
   const refresherEl = useRef<HTMLIonRefresherElement>(null)
-  
+
 
   const refresh = (e: CustomEvent) => {
-    queryClient.setQueryData(['Home'], (data) => ({
+    queryClient.setQueryData(['Home'], (data: any) => ({
       //pages: [],
       // @ts-ignore
       pages: data.pages.slice(0, 1),
@@ -106,7 +106,7 @@ const Home: FC = () => {
         <IonRefresher ref={refresherEl} slot="fixed" onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
-        
+
         {
           isLoading ? <SuspenseLoading /> : (
             <>
@@ -138,7 +138,7 @@ const Home: FC = () => {
         {/*    </IonTitle>*/}
         {/*  </IonToolbar>*/}
         {/*</IonHeader>*/}
-        
+
         {/*{*/}
         {/*  loading ? (*/}
         {/*    <SuspenseLoading />*/}

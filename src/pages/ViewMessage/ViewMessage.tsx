@@ -7,7 +7,7 @@ import {
   IonItem,
   IonLabel,
   IonNote,
-  IonPage, IonSpinner,
+  IonPage, IonRefresher, IonRefresherContent, IonSpinner,
   IonToolbar,
   useIonViewWillEnter,
 } from '@ionic/react';
@@ -21,7 +21,7 @@ import RenderImgs from './RenderImgs'
 import cx from "classnames";
 import Style from './index.module.scss'
 import {useQuery, useQueryClient} from "@tanstack/react-query";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
 
 
 const fetchData = async (param: any) => {
@@ -46,21 +46,20 @@ function ViewMessage() {
     queryFn: fetchData
   })
   const data = query?.data as unknown as CheyouDetailRoot['data']
-  
-  
-  useEffect(() => {
 
+  const refresh = (e: CustomEvent) => {
+    query.refetch().finally(() => {
+      e.detail.complete()
+    })
+  };
+
+
+  useEffect(() => {
     return () => {
       queryClient.cancelQueries({ queryKey: ['message', params.id] })
     }
   }, [])
-  
-  
-  // useIonViewWillEnter( () => {
-  //   fetchData(params.id).then(res => {
-  //     setData(res.data);
-  //   })
-  // });
+
 
   const content = () => {
     // 有标题+内容
@@ -120,10 +119,13 @@ function ViewMessage() {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen>
+      <IonContent fullscreen={false}>
+        <IonRefresher slot="fixed" onIonRefresh={refresh}>
+          <IonRefresherContent></IonRefresherContent>
+        </IonRefresher>
         {
           query.isLoading ? <IonSpinner /> : (
-            <div className="px-4 pt-4">
+            <div className="px-4 mt-4">
               {content()}
             </div>
           )

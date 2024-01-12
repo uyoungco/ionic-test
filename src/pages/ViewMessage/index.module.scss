@@ -3,6 +3,7 @@
 .article {
   width: 100%;
   height: 100%;
+  @apply font-sans;
   :global {
     p {
       //font-size: 0.18rem;

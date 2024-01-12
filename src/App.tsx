@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { Redirect, Route } from 'react-router-dom';
 import { NextUIProvider } from "@nextui-org/react";
+import {ThemeProvider as NextThemesProvider} from "next-themes";
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import {
@@ -77,21 +78,23 @@ const App: FC = () => {
     <QueryClientProvider client={queryClient}>
       <Nice.Provider>
         <NextUIProvider>
-          <IonApp>
-            <IonReactRouter>
-              <IonRouterOutlet>
-                <Route path="/" exact={true}>
-                  <Redirect to="/home" />
-                </Route>
-                <Route path="/home" exact={true}>
-                  <Home />
-                </Route>
-                <Route path="/message/:id">
-                  <ViewMessage />
-                </Route>
-              </IonRouterOutlet>
-            </IonReactRouter>
-          </IonApp>
+          <NextThemesProvider>
+            <IonApp>
+              <IonReactRouter>
+                <IonRouterOutlet>
+                  <Route path="/" exact={true}>
+                    <Redirect to="/home" />
+                  </Route>
+                  <Route path="/home" exact={true}>
+                    <Home />
+                  </Route>
+                  <Route path="/message/:id">
+                    <ViewMessage />
+                  </Route>
+                </IonRouterOutlet>
+              </IonReactRouter>
+            </IonApp>
+          </NextThemesProvider>
         </NextUIProvider>
       </Nice.Provider>
       <ReactQueryDevtools initialIsOpen />

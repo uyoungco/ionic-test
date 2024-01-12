@@ -23,6 +23,7 @@ import Style from './index.module.scss'
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import React, {useEffect} from "react";
 import CommentsList from "@/components/CommentsList";
+import ThemeSwitch from "@/components/ThemeSwitch";
 
 
 const fetchData = async (param: any) => {
@@ -76,7 +77,7 @@ function ViewMessage() {
           {/*  className={Style.article}*/}
           {/*></div>*/}
           <div
-            className={cx(Style.article, 'detail-article')}
+            className={cx(Style.article, 'detail-article mt-2')}
             dangerouslySetInnerHTML={{__html: renderEmoticon(data.content)}}
           />
         </>
@@ -87,7 +88,7 @@ function ViewMessage() {
     return (
       <>
         {data?.thread_title &&
-            <h1 className="transition-colors text-xl text-default-800 my-2 font-medium">
+            <h1 className="transition-colors text-xl text-default-800 my-2 font-medium mb-2">
               {renderEmoticon(data.thread_title)}
             </h1>
         }
@@ -117,6 +118,9 @@ function ViewMessage() {
           <IonButtons slot="start">
             <IonBackButton text="Inbox" defaultHref="/home"></IonBackButton>
           </IonButtons>
+          <IonButtons slot="end">
+            <ThemeSwitch />
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
@@ -125,7 +129,11 @@ function ViewMessage() {
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
         {
-          query.isLoading ? <IonSpinner /> : (
+          query.isLoading ? (
+            <div className="w-full h-32 flex justify-center items-center">
+              <IonSpinner />
+            </div>
+            ) : (
             <>
               <div className="px-4 mt-4">
                 {content()}

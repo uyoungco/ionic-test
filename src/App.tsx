@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, {FC, useMemo} from "react";
 import { Redirect, Route } from 'react-router-dom';
 import { NextUIProvider } from "@nextui-org/react";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
@@ -68,17 +68,19 @@ persistQueryClient({
 
 const App: FC = () => {
   const [showDevtools, setShowDevtools] = React.useState(false)
-
+  const prefersDark = useMemo(() => window.matchMedia('(prefers-color-scheme: dark)'), [])
   React.useEffect(() => {
     // @ts-ignore
     window.toggleDevtools = () => setShowDevtools((old) => !old)
   }, [])
 
+  const defaultTheme = prefersDark.matches ? 'dark' : 'light'
+
   return (
     <QueryClientProvider client={queryClient}>
       <Nice.Provider>
         <NextUIProvider>
-          <NextThemesProvider>
+          <NextThemesProvider defaultTheme={defaultTheme}>
             <IonApp>
               <IonReactRouter>
                 <IonRouterOutlet>

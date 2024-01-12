@@ -68,19 +68,18 @@ persistQueryClient({
 
 const App: FC = () => {
   const [showDevtools, setShowDevtools] = React.useState(false)
-  const prefersDark = useMemo(() => window.matchMedia('(prefers-color-scheme: dark)'), [])
+
   React.useEffect(() => {
     // @ts-ignore
     window.toggleDevtools = () => setShowDevtools((old) => !old)
   }, [])
 
-  const defaultTheme = prefersDark.matches ? 'dark' : 'light'
 
   return (
     <QueryClientProvider client={queryClient}>
       <Nice.Provider>
         <NextUIProvider>
-          <NextThemesProvider defaultTheme={defaultTheme}>
+          <NextThemesProvider attribute="class">
             <IonApp>
               <IonReactRouter>
                 <IonRouterOutlet>

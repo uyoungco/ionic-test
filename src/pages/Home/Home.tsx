@@ -97,9 +97,11 @@ const Home: FC = () => {
 
 
   const generateItems = async (e: IonInfiniteScrollCustomEvent<void>) => {
-    !isFetching && fetchNextPage().finally(() => {
-      e.target.complete()
-    })
+    if (!isFetchingNextPage && !isFetching && hasNextPage) {
+      fetchNextPage().finally(() => {
+        e.target.complete()
+      })
+    }
   };
 
   const listbar = [
@@ -122,9 +124,8 @@ const Home: FC = () => {
   ]
 
   const handleClick = (value: string) => {
-    setValue(value)
     contentRef.current?.scrollToTop(500).finally(() => {
-      // refetch()
+      setValue(value)
     });
   }
 

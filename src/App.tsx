@@ -36,6 +36,7 @@ import './theme/variables.css';
 
 /* tailwind */
 import './index.scss'
+import 'react-photo-view/dist/react-photo-view.css';
 
 
 setupIonicReact();

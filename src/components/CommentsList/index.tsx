@@ -62,7 +62,7 @@ const CommentsList: FC<CommentsListType> = ({ group_id }) => {
               <div className="flex items-center py-2">
                 <div className="avatar">
                   <IonAvatar className="w-8 h-8 text-tiny z-0">
-                    <img alt="Silhouette of a person's head" src={item.comment.user_profile_image_url}/>
+                    <img alt={item.comment.user_name} src={item.comment.user_profile_image_url}/>
                   </IonAvatar>
                 </div>
                 <div className="ml-2">

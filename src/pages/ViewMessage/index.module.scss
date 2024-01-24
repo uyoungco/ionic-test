@@ -11,8 +11,11 @@
       //text-align: justify;
       // word-break: break-all;
       //color: var(--color-gray-900);
-      white-space: pre-wrap;
-      @apply text-default-800 text-base transition-colors;
+      white-space: pre-wrap!important;
+      line-height: 1.5rem!important;
+      font-size: 1rem!important;
+      text-align: justify;
+      @apply text-default-800 transition-colors;
     }
 
     .syl-image-wrapper {

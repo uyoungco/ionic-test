@@ -77,7 +77,7 @@ function ViewMessage() {
           {/*  className={Style.article}*/}
           {/*></div>*/}
           <div
-            className={cx(Style.article, 'detail-article mt-2')}
+            className={cx(Style.article, 'detail-article mt-2 mb-4')}
             dangerouslySetInnerHTML={{__html: renderEmoticon(data.content)}}
           />
         </>

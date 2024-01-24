@@ -62,10 +62,10 @@ const localStoragePersister = createSyncStoragePersister({
   storage: window.localStorage,
 })
 
-persistQueryClient({
-  queryClient,
-  persister: localStoragePersister,
-})
+// persistQueryClient({
+//   queryClient,
+//   persister: localStoragePersister,
+// })
 
 const App: FC = () => {
   const [showDevtools, setShowDevtools] = React.useState(false)

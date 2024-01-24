@@ -30,7 +30,7 @@ const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCurs
     method: 'get',
     params: {
       page: pageParam,
-      tab_name: queryKey[1]
+      ...queryKey[1],
     },
     signal,
   })
@@ -44,20 +44,20 @@ const fetchProjects = async (param: any): Promise<{ data: CheyouList[], nextCurs
 const Home: FC = () => {
   const queryClient = useQueryClient()
   const [value, setValue] = useState('dongtai')
-  useEffect(() => {
-    queryClient.setQueryData(['Home', value], (data: any) => {
-      if (data?.pages?.length) {
-        return {
-          //pages: [],
-          // @ts-ignore
-          pages: data.pages.slice(0, 1),
-          // @ts-ignore
-          pageParams: data.pageParams.slice(0, 1),
-        }
-      }
-      return
-    })
-  }, [])
+  // useEffect(() => {
+  //   queryClient.setQueryData(['Home', value], (data: any) => {
+  //     if (data?.pages?.length) {
+  //       return {
+  //         //pages: [],
+  //         // @ts-ignore
+  //         pages: data.pages.slice(0, 1),
+  //         // @ts-ignore
+  //         pageParams: data.pageParams.slice(0, 1),
+  //       }
+  //     }
+  //     return
+  //   })
+  // }, [])
 
   const {
     isLoading,
@@ -70,12 +70,13 @@ const Home: FC = () => {
     status,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['Home', value],
+    queryKey: ['Home', { tab_name: value }],
     queryFn: fetchProjects,
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages,lastPageParam) => {
       return lastPage.nextCursor
     },
+    enabled: !!value,
   })
   const contentRef = useRef<HTMLIonContentElement>(null);
   const scrollEl = useRef<HTMLIonInfiniteScrollElement>(null)
@@ -83,7 +84,7 @@ const Home: FC = () => {
 
 
   const refresh = (e: CustomEvent) => {
-    queryClient.setQueryData(['Home', value], (data: any) => ({
+    queryClient.setQueryData(['Home'], (data: any) => ({
       //pages: [],
       // @ts-ignore
       pages: data.pages.slice(0, 1),
@@ -97,7 +98,7 @@ const Home: FC = () => {
 
 
   const generateItems = async (e: IonInfiniteScrollCustomEvent<void>) => {
-    if (!isFetchingNextPage && !isFetching && hasNextPage) {
+    if (!isFetchingNextPage && isFetching && hasNextPage) {
       fetchNextPage().finally(() => {
         e.target.complete()
       })
@@ -124,7 +125,7 @@ const Home: FC = () => {
   ]
 
   const handleClick = (value: string) => {
-    contentRef.current?.scrollToTop(500).finally(() => {
+    contentRef.current?.scrollToTop(0).finally(() => {
       setValue(value)
     });
   }
